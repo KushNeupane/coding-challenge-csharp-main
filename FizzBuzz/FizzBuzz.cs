@@ -21,71 +21,87 @@ namespace FizzBuzz
 {
     public class FizzBuzzEngine
     {
-        private FizzBuzzRule[] rules {get; set;}
-
-        public FizzBuzzEngine()
-        {
-            this.rules = new FizzBuzzRule[]{};
-        }
-
-        public FizzBuzzEngine(FizzBuzzRule[] r)
-        {
-            this.rules = r;
-        }
+        private List<IRules> _rules;
+        public FizzBuzzEngine(List<IRules> rules) => _rules = rules;
 
         public void Run(int limit = 100)
         {
             for (int i = 1; i <= limit; i++)
             {
-                string output = "";
-                foreach (FizzBuzzRule rule in this.rules)
+                string output = string.Empty;
+                foreach (var rule in _rules)
                 {
-                    if (rule.op(i))
-                    {
-                        output += rule.output;
-                    }
+                    output = rule.Operation(i);
+                    if (!string.IsNullOrEmpty(output))
+                        break;
                 }
-
-
-                if (string.IsNullOrEmpty(output))
-                {
-                    output = i.ToString();
-                }
-                
+                if (output == string.Empty) { output = new DefaultOutput().Operation(i); }
                 Console.WriteLine("{0}: {1}", i, output);
             }
         }
     }
 
-    public class FizzBuzzRule
+    internal class FizzRule : IRules
     {
-        public Func<int, bool> op {get; set;}
-        public string output {get; set;}
+        public string Operation(int x)
+        {
+            return x % 3 == 0 ? "Fizz" : string.Empty;
+        }
     }
-    
+
+    internal class BuzzRule : IRules
+    {
+        public string Operation(int x)
+        {
+            return x % 5 == 0 ? "Buzz" : string.Empty;
+        }
+    }
+
+    internal class FizzAndBuzzRules : IRules
+    {
+        public string Operation(int x)
+        {
+            return x % 3 == 0 && x % 5 == 0 ? "FizzBuzz" : string.Empty;
+        }
+    }
+
+    internal class FooRule : IRules
+    {
+        public string Operation(int x)
+        {
+            return x * 10 > 100 ? "Foo" : string.Empty;
+        }
+    }
+
+    internal class BarRule : IRules
+    {
+        public string Operation(int x)
+        {
+            return x % 7 == 0 ? "Bar" : string.Empty;
+        }
+    }
+
+    internal class DefaultOutput : IRules
+    {
+        public string Operation(int x)
+        {
+            return x.ToString();
+        }
+    }
+
     public class Program
     {
         public static void Main(string[] args)
         {
-            var fizz = new FizzBuzzRule();
-            fizz.op = x => x % 3 == 0;
-            fizz.output = "Fizz";
-
-            var buzz = new FizzBuzzRule();
-            buzz.op = x => x % 5 == 0;
-            buzz.output = "Buzz";
-
-            var bar = new FizzBuzzRule();
-            bar.op = x => x % 7 == 0;
-            bar.output = "Bar";
-
-            var foo = new FizzBuzzRule();
-            foo.op = x => (x * 10) > 100;
-            foo.output = "Foo";
-
-            var rulez = new FizzBuzzRule[]{ fizz, buzz, bar, foo };
-            FizzBuzzEngine engine = new FizzBuzzEngine(rulez);
-            engine.Run();
+            var rules = new List<IRules>
+            {
+                new FizzAndBuzzRules(),
+                new BarRule(),
+                new FizzRule(),
+                new BuzzRule(),
+                new FooRule(),
+            };
+            new FizzBuzzEngine(rules).Run();
         }
     }
 }

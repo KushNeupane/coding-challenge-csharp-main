@@ -19,34 +19,16 @@ namespace Pyramid
     {
         private static void Pyramid(int height)
         {
-            var width = (height * 2) - 1;
-            foreach (var i in Enumerable.Range(0, height))
+            for (int row = 1; row <= height; row++)
             {
-                var row = "";
-                var padding = height - i - 1;
-                
-                foreach (var _ in Enumerable.Range(0, padding))
-                {
-                    row += " ";
-                }
-
-                foreach (var _ in Enumerable.Range(0, width - padding * 2))
-                {
-                    row += "*";
-                }
-
-                foreach (var _ in Enumerable.Range(0, padding))
-                {
-                    row += " ";
-                }
-
-                Console.WriteLine(row);
+                string layer = string.Join(" ", Enumerable.Repeat("*", row));
+                Console.WriteLine(layer.PadLeft(height - row + layer.Length));
             }
         }
-        
+
         public static void Main(string[] args)
         {
-            Pyramid(5);
+            Pyramid(10);
         }
     }
 }
